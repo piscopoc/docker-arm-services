@@ -1,0 +1,31 @@
+version: '2'
+
+services:
+  watchtower:
+    restart: unless-stopped
+    container_name: watchtower
+    image: v2tec/watchtower:armhf-latest
+    mem_limit: 150m
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    cap_add:
+      - NET_ADMIN
+  pihole:
+    restart: unless-stopped
+    container_name: pihole
+    image: diginc/pi-hole:arm
+    mem_limit: 150m
+    volumes:
+      - /data/pihole/config:/etc/pihole
+      - /data/pihole/dnsmasq.d/:/etc/dnsmasq.d/
+    environment:
+      - ServerIP=${PIHOLE_SERVERIP}
+      - TZ=${PIHOLE_TZ}
+      - WEBPASSWORD=${PIHOLE_WEBPASSWORD}
+      - IPv6=False
+    cap_add:
+      - NET_ADMIN
+    ports:
+      - "53:53/tcp"
+      - "53:53/udp"
+      - "80:80"
